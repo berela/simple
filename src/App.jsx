@@ -1,5 +1,24 @@
-import { useMemo, useState } from 'react'
-import './App.css'
+import { useEffect, useMemo, useState } from 'react'
+import { Moon, Search, Sun } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 const categories = [
   { id: 'all', label: 'ყველა' },
@@ -8,6 +27,10 @@ const categories = [
   { id: 'security', label: 'უსაფრთხოება' },
   { id: 'data', label: 'მონაცემები' },
 ]
+
+const categoryLabels = Object.fromEntries(
+  categories.filter((c) => c.id !== 'all').map((c) => [c.id, c.label]),
+)
 
 const topics = [
   {
@@ -48,9 +71,26 @@ const topics = [
   },
 ]
 
+const facts = [
+  'პირველი ელექტრონული კომპიუტერი ENIAC 1945 წელს შეიქმნა.',
+  'ინტერნეტი 1969 წელს დაიწყო ARPANET პროექტის სახით.',
+  'მსოფლიოში ყოველ წამს ტერაბაიტების მოცულობის მონაცემი იქმნება.',
+  'IT სპეციალისტების მოთხოვნა მუდმივად იზრდება.',
+]
+
 function App() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
+  const [isDark, setIsDark] = useState(false)
+
+  useEffect(() => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    setIsDark(prefersDark)
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark)
+  }, [isDark])
 
   const filteredTopics = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -67,85 +107,151 @@ function App() {
   }, [search, category])
 
   return (
-    <div className="page">
-      <header className="hero">
-        <p className="badge">ინფორმაციული გვერდი</p>
-        <h1>ინფორმაციული ტექნოლოგიები</h1>
-        <p className="subtitle">
-          IT (Information Technology) — ტექნოლოგიების სფერო, რომელიც ინფორმაციის შეგროვებას,
-          დამუშავებას, შენახვას და გადაცემას ემსახურება.
-        </p>
-      </header>
+    <div className="min-h-svh bg-background">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+        <header className="relative mb-10 text-center">
+          <div className="absolute top-0 right-0">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setIsDark((value) => !value)}
+              aria-label={isDark ? 'ღია თემა' : 'მუქი თემა'}
+            >
+              {isDark ? <Sun /> : <Moon />}
+            </Button>
+          </div>
 
-      <section className="intro">
-        <h2>რა არის IT?</h2>
-        <p>
-          ინფორმაციული ტექნოლოგიები მოიცავს კომპიუტერულ ტექნიკას, პროგრამებს, ქსელებს და
-          ციფრულ სისტემებს. ისინი გამოიყენება განათლებაში, მედიცინაში, ბიზნესში, მთავრობაში
-          და ყოველდღიურ ცხოვრებაში — სმარტფონიდან ბანკის აპლიკაციამდე.
-        </p>
-      </section>
+          <Badge variant="secondary" className="mb-4">
+            ინფორმაციული გვერდი
+          </Badge>
+          <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+            ინფორმაციული ტექნოლოგიები
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
+            IT (Information Technology) — ტექნოლოგიების სფერო, რომელიც ინფორმაციის
+            შეგროვებას, დამუშავებას, შენახვას და გადაცემას ემსახურება.
+          </p>
+        </header>
 
-      <section className="topics">
-        <h2>ძირითადი მიმართულებები</h2>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>რა არის IT?</CardTitle>
+            <CardDescription>
+              მოკლე შესავალი ინფორმაციულ ტექნოლოგიებში
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm leading-relaxed text-muted-foreground">
+            ინფორმაციული ტექნოლოგიები მოიცავს კომპიუტერულ ტექნიკას, პროგრამებს,
+            ქსელებს და ციფრულ სისტემებს. ისინი გამოიყენება განათლებაში, მედიცინაში,
+            ბიზნესში, მთავრობაში და ყოველდღიურ ცხოვრებაში — სმარტფონიდან ბანკის
+            აპლიკაციამდე.
+          </CardContent>
+        </Card>
 
-        <div className="filter-bar">
-          <label className="search-field">
-            <span className="visually-hidden">ძიება</span>
-            <input
-              type="search"
-              placeholder="ძიება სათაურით ან აღწერით..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </label>
+        <section className="mb-8">
+          <div className="mb-5 flex flex-col gap-1">
+            <h2 className="font-heading text-xl font-semibold tracking-tight">
+              ძირითადი მიმართულებები
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              გაფილტრე თემები კატეგორიით ან ძიებით
+            </p>
+          </div>
 
-          <div className="category-filters" role="group" aria-label="კატეგორიის ფილტრი">
-            {categories.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={category === item.id ? 'filter-btn active' : 'filter-btn'}
-                onClick={() => setCategory(item.id)}
+          <Card className="mb-6">
+            <CardContent className="flex flex-col gap-4 pt-6">
+              <div className="relative">
+                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="ძიება სათაურით ან აღწერით..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+
+              <ToggleGroup
+                variant="outline"
+                size="sm"
+                value={[category]}
+                onValueChange={(values) => setCategory(values[0] ?? 'all')}
+                className="flex w-full flex-wrap"
               >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
+                {categories.map((item) => (
+                  <ToggleGroupItem key={item.id} value={item.id}>
+                    {item.label}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
 
-        <p className="filter-result">
-          ნაპოვნია: <strong>{filteredTopics.length}</strong> / {topics.length}
-        </p>
+              <p className="text-sm text-muted-foreground">
+                ნაპოვნია:{' '}
+                <span className="font-medium text-foreground">
+                  {filteredTopics.length}
+                </span>{' '}
+                / {topics.length}
+              </p>
+            </CardContent>
+          </Card>
 
-        {filteredTopics.length > 0 ? (
-          <div className="grid">
-            {filteredTopics.map((topic) => (
-              <article key={topic.title} className="card">
-                <span className="card-icon" aria-hidden="true">{topic.icon}</span>
-                <h3>{topic.title}</h3>
-                <p>{topic.text}</p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <p className="empty-state">შედეგი ვერ მოიძებნა. სცადე სხვა სიტყვა ან კატეგორია.</p>
-        )}
-      </section>
+          {filteredTopics.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredTopics.map((topic) => (
+                <Card key={topic.title} className="transition-shadow hover:shadow-md">
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-2xl" aria-hidden="true">
+                        {topic.icon}
+                      </span>
+                      <Badge variant="outline">{categoryLabels[topic.category]}</Badge>
+                    </div>
+                    <CardTitle className="text-base">{topic.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm leading-relaxed text-muted-foreground">
+                    {topic.text}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Empty className="border">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Search />
+                </EmptyMedia>
+                <EmptyTitle>შედეგი ვერ მოიძებნა</EmptyTitle>
+                <EmptyDescription>
+                  სცადე სხვა საძიებო სიტყვა ან აირჩიე სხვა კატეგორია.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          )}
+        </section>
 
-      <section className="facts">
-        <h2>საინტერესო ფაქტები</h2>
-        <ul>
-          <li>პირველი ელექტრონული კომპიუტერი ENIAC 1945 წელს შეიქმნა.</li>
-          <li>ინტერნეტი 1969 წელს დაიწყო ARPANET პროექტის სახით.</li>
-          <li>მსოფლიოში ყოველ წამს ტერაბაიტების მოცულობის მონაცემი იქმნება.</li>
-          <li>IT სპეციალისტების მოთხოვნა მუდმივად იზრდება.</li>
-        </ul>
-      </section>
+        <Separator className="my-8" />
 
-      <footer className="footer">
-        <p>შექმნილია React-ით · {new Date().getFullYear()}</p>
-      </footer>
+        <Card>
+          <CardHeader>
+            <CardTitle>საინტერესო ფაქტები</CardTitle>
+            <CardDescription>IT-ის ისტორიიდან რამდენიმე მნიშვნელოვანი მომენტი</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+              {facts.map((fact) => (
+                <li key={fact} className="flex gap-3">
+                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>{fact}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        <footer className="mt-10 text-center text-sm text-muted-foreground">
+          შექმნილია React + shadcn/ui-ით · {new Date().getFullYear()}
+        </footer>
+      </div>
     </div>
   )
 }
